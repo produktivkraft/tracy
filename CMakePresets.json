@@ -6,7 +6,7 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_BUILD_TYPE": "Release",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install",
         "CMAKE_EXPORT_COMPILE_COMMANDS": true,
         "CMAKE_C_COMPILER": "/usr/bin/clang",
