@@ -4,8 +4,7 @@ DEFINES += -DTRACY_NO_STATISTICS
 INCLUDES := $(shell pkg-config --cflags capstone)
 LIBS += $(shell pkg-config --libs capstone) -lpthread
 PROJECT := capture
-# IMAGE := $(PROJECT)-$(BUILD)
-IMAGE := $(PROJECT)
+IMAGE := $(PROJECT)-$(BUILD)
 
 FILTER := ../../../getopt/getopt.c
 include ../../../common/src-from-vcxproj.mk
