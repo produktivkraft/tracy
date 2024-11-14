@@ -5,7 +5,48 @@ here.
 vx.xx.x (xxxx-xx-xx)
 --------------------
 
+- Enabled workaround for MSVC runtime library SNAFU, which manifested with
+  the profiler executables crashing at startup inside mutex code.
+- CPU topology data now includes CPU die information.
+- Clients running under Wine will now report that in the trace info.
+- Added flame graph.
+- The Git ref information for the build is now included in the about dialog.
+- Added support for clipboard copy and paste on Wayland.
+- The welcome dialog client address entry field will now trim the entered
+  address, so that stray spaces at the start and the end are removed. This
+  should reduce the amount of user precision required when copy pasting the
+  address from somewhere else.
+- Metal GPU profiling is now available.
+- Profiling zones can now optionally inherit their parent color.
+- It is no longer needed to have up-to-date copy of wayland-protocols
+  installed. CMake will download the required version from GitHub.
+- Added option to show the top inline in symbol statistics list in stead of
+  the symbol name.
+
+
+v0.11.1 (2024-08-22)
+--------------------
+
+- Utilities import-chrome and import-fuchsia now live together in the import
+  directory.
+- Added TRACY_VERBOSE to available CMake options.
+- It is now possible to set TRACY_SAMPLING_HZ via a environment variable.
+- Thread group hints can be now used to group threads together in the
+  profiler UI.
+- Limit Lua file names to 255 characters, as the source string can contain
+  the whole script, if loaded with loadstring().
+
+
+v0.11.0 (2024-07-16)
+--------------------
+
 - Support for pre-0.9 traces has been dropped.
+- The old server-side build system has been replaced by CMake. The client
+  integration is not affected. Refer to the manual for details.
+  - Most importantly, a known version of the capstone library is now
+    downloaded from GitHub. You will need to have git installed for this
+    to work (there is a CMake option to use the capstone installed on the
+    system, as was done previously).
 - Various Meson fixes.
 - Proper way of loading Vulkan calibrated timestamps extension.
 - Fixed C API support for GPU tracing when on demand mode is enabled.
@@ -67,6 +108,63 @@ vx.xx.x (xxxx-xx-xx)
     places in code), it is not possible to tell which of the code locations
     the source location corresponds to and only the source code will be
     displayed.
+- Added TracyNoop macro, which inserts a reference to Tracy's object file
+  into your application. Use it if you want to use Tracy in sampling mode,
+  without any manual instrumentation (so no references of your own exist)
+  and link Tracy as a static library. Linkers will only include library code
+  if code references it, and this doesn't work as intended with Tracy, as it
+  ignores global constructors that have side effects.
+- ZoneText and ZoneName macros now have a printf-like variant, denoted with
+  a 'F' postfix.
+- The 'tracy_shared_libs' Meson option was removed. Use interface provided
+  by Meson to set the library type instead.
+- Dropped the 'tracy_' prefix from Meson options. The `tracy_enable` option
+  remains as it was, as it can be inherited from parent projects.
+- Fixed display of active / inactive allocations in memory call tree.
+- Instrumentation statistics can be now sorted by source location.
+- Added option to hide external code frames in call stack view.
+- There's now a copy to clipboard button in the statistics view. It copies
+  the visible rows of either the instrumentation or GPU statistics view to
+  a CSV string matching a subset of the csvexport format.
+- Source file contents can be copied to the clipboard.
+- Added key binding for immediate reconnect: Ctrl+Shift+Alt+R.
+- Lock markup is now available through the C API.
+- Symbol statistics window now allows aggregation of inlined functions in
+  symbols.
+- Cost measurements of inlined functions in the symbol statistics window
+  can be now relative to the base symbol instead of total program run time.
+- ScopedZone and AllocSourceLocation now accept color parameter. Impact on
+  existing code should be minimal.
+  - AllocSourceLocation has a new parameter with a default value.
+  - __tracy_alloc_srcloc and __tracy_alloc_srcloc_name break the existing
+    API. This can be easily fixed by setting the last parameter to zero.
+- To build the profiler GUI with Wayland you now need wayland-scanner and
+  wayland-protocols to be installed. A reasonably recent release of the
+  protocols is required, which, as always, is not available on Ubuntu.
+  Seriously, stop trying to build modern software with that broken distro.
+- Fractional DPI scaling is now properly supported on Wayland.
+- Added Python bindings.
+- The per-line sampling statistics are now also displayed as a percentage
+  of total program run time.
+- The out-of-focus render frame rate reduction can be now disabled in
+  global settings.
+- It is now possible to load source files that are newer than the trace.
+  The default setting is still to reject such files.
+- Memory limit for a capture can be now set, both in the GUI profiler and
+  in the capture utility.
+- Thread list can be now sorted alphabetically.
+- It is now possible to adjust plot height.
+- Trace comparison statistics were expanded and made more clear.
+- Implemented retrieval of kernel symbol code on Linux.
+- Added support for multiple compression streams in trace files. This
+  effectively parallelizes both load and save operations.
+  - The default save setup is now set to Zstd level 3 with 4 compression
+    streams. This gives both faster compression time and smaller file size.
+- New users will be now eased into the profiler with a set of tutorial
+  achievements.
+- You can now set the timeline options default values in global settings.
+- Added a check for program memory being available before symbol retrieval
+  on Windows.
 
 
 v0.10.0 (2023-10-16)

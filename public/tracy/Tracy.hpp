@@ -18,6 +18,8 @@
 
 #ifndef TRACY_ENABLE
 
+#define TracyNoop
+
 #define ZoneNamed(x,y)
 #define ZoneNamedN(x,y,z)
 #define ZoneNamedC(x,y,z)
@@ -33,8 +35,12 @@
 
 #define ZoneText(x,y)
 #define ZoneTextV(x,y,z)
+#define ZoneTextF(x,...)
+#define ZoneTextVF(x,y,...)
 #define ZoneName(x,y)
 #define ZoneNameV(x,y,z)
+#define ZoneNameF(x,...)
+#define ZoneNameVF(x,y,...)
 #define ZoneColor(x)
 #define ZoneColorV(x,y)
 #define ZoneValue(x)
@@ -69,8 +75,10 @@
 
 #define TracyAlloc(x,y)
 #define TracyFree(x)
+#define TracyMemoryDiscard(x)
 #define TracySecureAlloc(x,y)
 #define TracySecureFree(x)
+#define TracySecureMemoryDiscard(x)
 
 #define TracyAllocN(x,y,z)
 #define TracyFreeN(x,y)
@@ -92,8 +100,10 @@
 
 #define TracyAllocS(x,y,z)
 #define TracyFreeS(x,y)
+#define TracyMemoryDiscardS(x,y)
 #define TracySecureAllocS(x,y,z)
 #define TracySecureFreeS(x,y)
+#define TracySecureMemoryDiscardS(x,y)
 
 #define TracyAllocNS(x,y,z,w)
 #define TracyFreeNS(x,y,z)
@@ -113,6 +123,7 @@
 #define TracySetProgramName(x)
 
 #define TracyFiberEnter(x)
+#define TracyFiberEnterHint(x,y)
 #define TracyFiberLeave
 
 #else
@@ -123,6 +134,8 @@
 #include "../client/TracyProfiler.hpp"
 #include "../client/TracyScoped.hpp"
 
+#define TracyNoop tracy::ProfilerAvailable()
+
 #if defined TRACY_HAS_CALLSTACK && defined TRACY_CALLSTACK
 #  define ZoneNamed( varname, active ) static constexpr tracy::SourceLocationData TracyConcat(__tracy_source_location,TracyLine) { nullptr, TracyFunction,  TracyFile, (uint32_t)TracyLine, 0 }; tracy::ScopedZone varname( &TracyConcat(__tracy_source_location,TracyLine), TRACY_CALLSTACK, active )
 #  define ZoneNamedN( varname, name, active ) static constexpr tracy::SourceLocationData TracyConcat(__tracy_source_location,TracyLine) { name, TracyFunction,  TracyFile, (uint32_t)TracyLine, 0 }; tracy::ScopedZone varname( &TracyConcat(__tracy_source_location,TracyLine), TRACY_CALLSTACK, active )
@@ -131,6 +144,7 @@
 
 #  define ZoneTransient( varname, active ) tracy::ScopedZone varname( TracyLine, TracyFile, strlen( TracyFile ), TracyFunction, strlen( TracyFunction ), nullptr, 0, TRACY_CALLSTACK, active )
 #  define ZoneTransientN( varname, name, active ) tracy::ScopedZone varname( TracyLine, TracyFile, strlen( TracyFile ), TracyFunction, strlen( TracyFunction ), name, strlen( name ), TRACY_CALLSTACK, active )
+#  define ZoneTransientNC( varname, name, color, active ) tracy::ScopedZone varname( TracyLine, TracyFile, strlen( TracyFile ), TracyFunction, strlen( TracyFunction ), name, strlen( name ), color, TRACY_CALLSTACK, active )
 #else
 #  define ZoneNamed( varname, active ) static constexpr tracy::SourceLocationData TracyConcat(__tracy_source_location,TracyLine) { nullptr, TracyFunction,  TracyFile, (uint32_t)TracyLine, 0 }; tracy::ScopedZone varname( &TracyConcat(__tracy_source_location,TracyLine), active )
 #  define ZoneNamedN( varname, name, active ) static constexpr tracy::SourceLocationData TracyConcat(__tracy_source_location,TracyLine) { name, TracyFunction,  TracyFile, (uint32_t)TracyLine, 0 }; tracy::ScopedZone varname( &TracyConcat(__tracy_source_location,TracyLine), active )
@@ -139,6 +153,7 @@
 
 #  define ZoneTransient( varname, active ) tracy::ScopedZone varname( TracyLine, TracyFile, strlen( TracyFile ), TracyFunction, strlen( TracyFunction ), nullptr, 0, active )
 #  define ZoneTransientN( varname, name, active ) tracy::ScopedZone varname( TracyLine, TracyFile, strlen( TracyFile ), TracyFunction, strlen( TracyFunction ), name, strlen( name ), active )
+#  define ZoneTransientNC( varname, name, color, active ) tracy::ScopedZone varname( TracyLine, TracyFile, strlen( TracyFile ), TracyFunction, strlen( TracyFunction ), name, strlen( name ), color, active )
 #endif
 
 #define ZoneScoped ZoneNamed( ___tracy_scoped_zone, true )
@@ -148,8 +163,12 @@
 
 #define ZoneText( txt, size ) ___tracy_scoped_zone.Text( txt, size )
 #define ZoneTextV( varname, txt, size ) varname.Text( txt, size )
+#define ZoneTextF( fmt, ... ) ___tracy_scoped_zone.TextFmt( fmt, ##__VA_ARGS__ )
+#define ZoneTextVF( varname, fmt, ... ) varname.TextFmt( fmt, ##__VA_ARGS__ )
 #define ZoneName( txt, size ) ___tracy_scoped_zone.Name( txt, size )
 #define ZoneNameV( varname, txt, size ) varname.Name( txt, size )
+#define ZoneNameF( fmt, ... ) ___tracy_scoped_zone.NameFmt( fmt, ##__VA_ARGS__ )
+#define ZoneNameVF( varname, fmt, ... ) varname.NameFmt( fmt, ##__VA_ARGS__ )
 #define ZoneColor( color ) ___tracy_scoped_zone.Color( color )
 #define ZoneColorV( varname, color ) varname.Color( color )
 #define ZoneValue( value ) ___tracy_scoped_zone.Value( value )
@@ -191,8 +210,10 @@
 
 #  define TracyAllocN( ptr, size, name ) tracy::Profiler::MemAllocCallstackNamed( ptr, size, TRACY_CALLSTACK, false, name )
 #  define TracyFreeN( ptr, name ) tracy::Profiler::MemFreeCallstackNamed( ptr, TRACY_CALLSTACK, false, name )
+#  define TracyMemoryDiscard( name ) tracy::Profiler::MemDiscardCallstack( name, false, TRACY_CALLSTACK )
 #  define TracySecureAllocN( ptr, size, name ) tracy::Profiler::MemAllocCallstackNamed( ptr, size, TRACY_CALLSTACK, true, name )
 #  define TracySecureFreeN( ptr, name ) tracy::Profiler::MemFreeCallstackNamed( ptr, TRACY_CALLSTACK, true, name )
+#  define TracySecureMemoryDiscard( name ) tracy::Profiler::MemDiscardCallstack( name, true, TRACY_CALLSTACK )
 #else
 #  define TracyMessage( txt, size ) tracy::Profiler::Message( txt, size, 0 )
 #  define TracyMessageL( txt ) tracy::Profiler::Message( txt, 0 )
@@ -206,8 +227,10 @@
 
 #  define TracyAllocN( ptr, size, name ) tracy::Profiler::MemAllocNamed( ptr, size, false, name )
 #  define TracyFreeN( ptr, name ) tracy::Profiler::MemFreeNamed( ptr, false, name )
+#  define TracyMemoryDiscard( name ) tracy::Profiler::MemDiscard( name, false )
 #  define TracySecureAllocN( ptr, size, name ) tracy::Profiler::MemAllocNamed( ptr, size, true, name )
 #  define TracySecureFreeN( ptr, name ) tracy::Profiler::MemFreeNamed( ptr, true, name )
+#  define TracySecureMemoryDiscard( name ) tracy::Profiler::MemDiscard( name, true )
 #endif
 
 #ifdef TRACY_HAS_CALLSTACK
@@ -231,8 +254,10 @@
 
 #  define TracyAllocNS( ptr, size, depth, name ) tracy::Profiler::MemAllocCallstackNamed( ptr, size, depth, false, name )
 #  define TracyFreeNS( ptr, depth, name ) tracy::Profiler::MemFreeCallstackNamed( ptr, depth, false, name )
+#  define TracyMemoryDiscardS( name, depth ) tracy::Profiler::MemDiscardCallstack( name, false, depth )
 #  define TracySecureAllocNS( ptr, size, depth, name ) tracy::Profiler::MemAllocCallstackNamed( ptr, size, depth, true, name )
 #  define TracySecureFreeNS( ptr, depth, name ) tracy::Profiler::MemFreeCallstackNamed( ptr, depth, true, name )
+#  define TracySecureMemoryDiscardS( name, depth ) tracy::Profiler::MemDiscardCallstack( name, true, depth )
 
 #  define TracyMessageS( txt, size, depth ) tracy::Profiler::Message( txt, size, depth )
 #  define TracyMessageLS( txt, depth ) tracy::Profiler::Message( txt, depth )
@@ -259,8 +284,10 @@
 
 #  define TracyAllocNS( ptr, size, depth, name ) TracyAllocN( ptr, size, name )
 #  define TracyFreeNS( ptr, depth, name ) TracyFreeN( ptr, name )
+#  define TracyMemoryDiscardS( name, depth ) tracy::Profiler::MemDiscard( name, false )
 #  define TracySecureAllocNS( ptr, size, depth, name ) TracySecureAllocN( ptr, size, name )
 #  define TracySecureFreeNS( ptr, depth, name ) TracySecureFreeN( ptr, name )
+#  define TracySecureMemoryDiscardS( name, depth ) tracy::Profiler::MemDiscard( name, true )
 
 #  define TracyMessageS( txt, size, depth ) TracyMessage( txt, size )
 #  define TracyMessageLS( txt, depth ) TracyMessageL( txt )
@@ -275,7 +302,8 @@
 #define TracySetProgramName( name ) tracy::GetProfiler().SetProgramName( name );
 
 #ifdef TRACY_FIBERS
-#  define TracyFiberEnter( fiber ) tracy::Profiler::EnterFiber( fiber )
+#  define TracyFiberEnter( fiber ) tracy::Profiler::EnterFiber( fiber, 0 )
+#  define TracyFiberEnterHint( fiber, groupHint ) tracy::Profiler::EnterFiber( fiber, groupHint )
 #  define TracyFiberLeave tracy::Profiler::LeaveFiber()
 #endif
 

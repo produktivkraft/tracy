@@ -1,14 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Run version helper script
-include(version.cmake)
-
-set(TRACY_VERSION_MAJOR ${major})
-set(TRACY_VERSION_MINOR ${minor})
-set(TRACY_VERSION_PATCH ${patch})
-set(TRACY_VERSION_STRING "${TRACY_VERSION_MAJOR}.${TRACY_VERSION_MINOR}.${TRACY_VERSION_PATCH}")
+include(cmake/version.cmake)
 
 project(Tracy LANGUAGES CXX VERSION ${TRACY_VERSION_STRING})
+
+file(GENERATE OUTPUT .gitignore CONTENT "*")
 
 if(${BUILD_SHARED_LIBS})
 	set(DEFAULT_STATIC OFF)
@@ -41,13 +38,27 @@ target_link_libraries(
 )
 
 # Public dependency on some libraries required when using Mingw
-if(WIN32 AND ${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
+if(WIN32 AND ${CMAKE_CXX_COMPILER_ID} MATCHES "GNU|Clang")
     target_link_libraries(TracyClient PUBLIC ws2_32 dbghelp)
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
     find_library(EXECINFO_LIBRARY NAMES execinfo REQUIRED)
     target_link_libraries(TracyClient PUBLIC ${EXECINFO_LIBRARY})
+endif()
+
+if(TRACY_LIBUNWIND_BACKTRACE)
+    include(FindPkgConfig)
+    pkg_check_modules(unwind REQUIRED libunwind)
+    target_include_directories(TracyClient INTERFACE ${unwind_INCLUDE_DIRS})
+    target_link_libraries(TracyClient INTERFACE ${unwind_LINK_LIBRARIES})
+endif()
+
+if(TRACY_DEBUGINFOD)
+    include(FindPkgConfig)
+    pkg_check_modules(debuginfod REQUIRED libdebuginfod)
+    target_include_directories(TracyClient INTERFACE ${debuginfod_INCLUDE_DIRS})
+    target_link_libraries(TracyClient INTERFACE ${debuginfod_LINK_LIBRARIES})
 endif()
 
 add_library(Tracy::TracyClient ALIAS TracyClient)
@@ -87,6 +98,13 @@ set_option(TRACY_TIMER_FALLBACK "Use lower resolution timers" OFF)
 set_option(TRACY_LIBUNWIND_BACKTRACE "Use libunwind backtracing where supported" OFF)
 set_option(TRACY_SYMBOL_OFFLINE_RESOLVE "Instead of full runtime symbol resolution, only resolve the image path and offset to enable offline symbol resolution" OFF)
 set_option(TRACY_LIBBACKTRACE_ELF_DYNLOAD_SUPPORT "Enable libbacktrace to support dynamically loaded elfs in symbol resolution resolution after the first symbol resolve operation" OFF)
+set_option(TRACY_DEBUGINFOD "Enable debuginfod support" OFF)
+
+# advanced
+set_option(TRACY_VERBOSE "[advanced] Verbose output from the profiler" OFF)
+mark_as_advanced(TRACY_VERBOSE)
+set_option(TRACY_DEMANGLE "[advanced] Don't use default demangling function - You'll need to provide your own" OFF)
+mark_as_advanced(TRACY_DEMANGLE)
 
 if(NOT TRACY_STATIC)
     target_compile_definitions(TracyClient PRIVATE TRACY_EXPORTS)
@@ -112,6 +130,7 @@ set(client_includes
     ${TRACY_PUBLIC_DIR}/client/tracy_concurrentqueue.h
     ${TRACY_PUBLIC_DIR}/client/tracy_rpmalloc.hpp
     ${TRACY_PUBLIC_DIR}/client/tracy_SPSCQueue.h
+    ${TRACY_PUBLIC_DIR}/client/TracyKCore.hpp
     ${TRACY_PUBLIC_DIR}/client/TracyArmCpuTable.hpp
     ${TRACY_PUBLIC_DIR}/client/TracyCallstack.h
     ${TRACY_PUBLIC_DIR}/client/TracyCallstack.hpp
@@ -150,20 +169,35 @@ install(TARGETS TracyClient
         EXPORT TracyConfig
         RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR})
+        ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        COMPONENT lib)
+# Export targets to build tree root
+export(TARGETS TracyClient
+       NAMESPACE Tracy::
+       FILE ${CMAKE_BINARY_DIR}/TracyTargets.cmake)
 install(FILES ${tracy_includes}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tracy)
 install(FILES ${client_includes}
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/client)
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tracy/client)
 install(FILES ${common_includes}
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/common)
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tracy/common)
 install(EXPORT TracyConfig
         NAMESPACE Tracy::
         FILE TracyTargets.cmake
-        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/Tracy)
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 include(CMakePackageConfigHelpers)
 configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
         "${CMAKE_CURRENT_BINARY_DIR}/TracyConfig.cmake"
-        INSTALL_DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/Tracy)
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/TracyConfig.cmake
-        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/Tracy)
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+
+option(TRACY_CLIENT_PYTHON "Whether to build Tracy python client library" OFF)
+
+if(TRACY_CLIENT_PYTHON)
+    if(TRACY_STATIC)
+        message(FATAL_ERROR "Python-bindings require a shared client library")
+    endif()
+
+    add_subdirectory(python)
+endif()
