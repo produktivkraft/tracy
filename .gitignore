@@ -37,5 +37,4 @@ profiler/build/wasm/embed.tracy
 
 build/
 CMakeUserPresets.json
-.clangd
 .vscode/
