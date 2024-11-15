@@ -57,4 +57,12 @@ cmake --preset osx -DPython3_EXECUTABLE=$(which python3)
 cmake --build $PWD/build --target all
 cmake --build $PWD/build --target install
 
+pushd python
+pip install -e . -vvv
+popd
+
+# TODO: fix segmentation fault on macos
+# `segmentation fault python`
+python -c "import tracy_client; print(tracy_client.__file__)"
+
 ###############################################################################
