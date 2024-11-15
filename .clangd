@@ -3,7 +3,7 @@ Diagnostics:
 CompileFlags:
   Add:
     # TODO: any way to avoid abs path ?
-    # - -I/Users/allen/repos/_perf_hw/tracy/public
-    # - -I/Users/allen/repos/_perf_hw/tracy/public/tracy
+    - -I/Users/allen/repos/_perf_hw/tracy/public
+    - -I/Users/allen/repos/_perf_hw/tracy/public/tracy
     - -DTRACY_ENABLE
     - -DTRACY_FIBERS
