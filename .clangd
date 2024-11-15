@@ -1,10 +1,16 @@
 Diagnostics:
   UnusedIncludes: None
+  ClangTidy:
+    Remove:
+      - performance-avoid-endl
 CompileFlags:
   Add:
     # TODO: any way to avoid abs path ?
     - -I/Users/allen/repos/_perf_hw/tracy/public
     - -I/Users/allen/repos/_perf_hw/tracy/public/tracy
+    - -I/repos/_work/tracy/public
+    - -I/repos/_work/tracy/public/tracy
+    - -I/repos/_work/tracy/examples/OpenCLVectorAdd/build/_deps/openclheaders-src
     - -DTRACY_ENABLE
     - -DTRACY_FIBERS
     - -DTRACY_CALLSTACK
