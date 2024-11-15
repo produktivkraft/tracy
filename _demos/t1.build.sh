@@ -65,7 +65,7 @@ pushd python
 pip install -e . -vvv
 popd
 
-# TODO: fix segmentation fault on macos
+# TODO: fix segmentation fault on macos(seems fails on conda python with pybind11)
 # `segmentation fault python`
 python -c "import tracy_client; print(tracy_client.__file__)"
 
