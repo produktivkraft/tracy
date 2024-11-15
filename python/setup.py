@@ -42,7 +42,7 @@ setup(
     long_description="This package contains the client code only. See the documentation for further details.",
     url="https://github.com/wolfpld/tracy",
     ext_modules=[ManualExtension()],
-    cmdclass={"build_ext": DummyBuild},
+    # cmdclass={"build_ext": DummyBuild},
     package_dir={"": "."},
     packages=find_namespace_packages(where="."),
     package_data={"": ["py.typed"]},
