@@ -13,7 +13,10 @@
         "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
         "CMAKE_LINKER_TYPE": "LLD",
         "CMAKE_INSTALL_RPATH_USE_LINK_PATH": true,
-        "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/build/bin"
+        "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "${sourceDir}/build/bin",
+        "TRACY_CALLSTACK": true,
+        "TRACY_FIBERS": true,
+        "UNUSED": "UNUSED"
       }
     }
   ]
