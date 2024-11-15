@@ -41,7 +41,7 @@ setup(
     description="A real time, nanosecond resolution, remote telemetry, hybrid frame and sampling profiler for games and other applications.",
     long_description="This package contains the client code only. See the documentation for further details.",
     url="https://github.com/wolfpld/tracy",
-    ext_modules=[ManualExtension()],
+    # ext_modules=[ManualExtension()],
     # cmdclass={"build_ext": DummyBuild},
     package_dir={"": "."},
     packages=find_namespace_packages(where="."),

@@ -19,6 +19,7 @@
         "TRACY_FIBERS": true,
         "TRACY_STATIC": false,
         "TRACY_CLIENT_PYTHON": true,
+        "EXTERNAL_PYBIND11": false,
         "UNUSED": "UNUSED"
       }
     }

@@ -2,13 +2,18 @@ set(CMAKE_CXX_STANDARD 20)
 
 option(EXTERNAL_PYBIND11 "Whether to download pybind11" ON)
 
+find_package(Python3 3.6 COMPONENTS Interpreter Development REQUIRED)
+
 if(EXTERNAL_PYBIND11)
-    find_package(Python3 3.6 COMPONENTS Interpreter Development REQUIRED)
+    # find_package(Python 3.6 COMPONENTS Interpreter Development REQUIRED)
 
     include(FetchContent)
 
     FetchContent_Declare(pybind11 GIT_REPOSITORY "https://github.com/pybind/pybind11.git" GIT_TAG "v2.11.1" GIT_SHALLOW ON TEST_BEFORE_INSTALL ON)
     FetchContent_MakeAvailable(pybind11)
+else()
+    # pip install pybind11 pybind11-global
+    find_package(pybind11 REQUIRED)
 endif()
 
 set(BUFFER_SIZE 128 CACHE STRING "The size of the pointer buffer")
@@ -28,24 +33,24 @@ list(TRANSFORM common_includes REPLACE "^${TRACY_PUBLIC_DIR}" "${TRACY_PYTHON_DI
 list(TRANSFORM tracy_includes REPLACE "^${TRACY_PUBLIC_DIR}" "${TRACY_PYTHON_DIR}" OUTPUT_VARIABLE python_tracy_includes)
 
 add_custom_command(TARGET TracyClient TracyClientBindings POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${TRACY_PYTHON_DIR}/client
-    COMMAND ${CMAKE_COMMAND} -E copy ${client_includes} ${TRACY_PYTHON_DIR}/client
-    COMMAND ${CMAKE_COMMAND} -DFOLDER=${TRACY_PYTHON_DIR}/client -P ${CMAKE_CURRENT_SOURCE_DIR}/HeaderFixer.txt
+    # COMMAND ${CMAKE_COMMAND} -E make_directory ${TRACY_PYTHON_DIR}/client
+    # COMMAND ${CMAKE_COMMAND} -E copy ${client_includes} ${TRACY_PYTHON_DIR}/client
+    # COMMAND ${CMAKE_COMMAND} -DFOLDER=${TRACY_PYTHON_DIR}/client -P ${CMAKE_CURRENT_SOURCE_DIR}/HeaderFixer.txt
 
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${TRACY_PYTHON_DIR}/common
-    COMMAND ${CMAKE_COMMAND} -E copy ${common_includes} ${TRACY_PYTHON_DIR}/common
-    COMMAND ${CMAKE_COMMAND} -DFOLDER=${TRACY_PYTHON_DIR}/common -P ${CMAKE_CURRENT_SOURCE_DIR}/HeaderFixer.txt
+    # COMMAND ${CMAKE_COMMAND} -E make_directory ${TRACY_PYTHON_DIR}/common
+    # COMMAND ${CMAKE_COMMAND} -E copy ${common_includes} ${TRACY_PYTHON_DIR}/common
+    # COMMAND ${CMAKE_COMMAND} -DFOLDER=${TRACY_PYTHON_DIR}/common -P ${CMAKE_CURRENT_SOURCE_DIR}/HeaderFixer.txt
 
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${TRACY_PYTHON_DIR}/tracy
-    COMMAND ${CMAKE_COMMAND} -E copy ${tracy_includes} ${TRACY_PYTHON_DIR}/tracy
-    COMMAND ${CMAKE_COMMAND} -DFOLDER=${TRACY_PYTHON_DIR}/tracy -P ${CMAKE_CURRENT_SOURCE_DIR}/HeaderFixer.txt
+    # COMMAND ${CMAKE_COMMAND} -E make_directory ${TRACY_PYTHON_DIR}/tracy
+    # COMMAND ${CMAKE_COMMAND} -E copy ${tracy_includes} ${TRACY_PYTHON_DIR}/tracy
+    # COMMAND ${CMAKE_COMMAND} -DFOLDER=${TRACY_PYTHON_DIR}/tracy -P ${CMAKE_CURRENT_SOURCE_DIR}/HeaderFixer.txt
 
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:TracyClientBindings> ${TRACY_PYTHON_DIR}/
 
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:TracyClient> ${TRACY_PYTHON_DIR}/
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/../${TRACY_LIB_SYMLINK} ${TRACY_PYTHON_DIR}/
+    # COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:TracyClient> ${TRACY_PYTHON_DIR}/
+    # COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/../${TRACY_LIB_SYMLINK} ${TRACY_PYTHON_DIR}/
 
-    BYPRODUCTS ${python_client_includes} ${python_common_includes} ${python_tracy_includes} ${TRACY_PYTHON_DIR}/client ${TRACY_PYTHON_DIR}/common ${TRACY_PYTHON_DIR}/tracy
+    # BYPRODUCTS ${python_client_includes} ${python_common_includes} ${python_tracy_includes} ${TRACY_PYTHON_DIR}/client ${TRACY_PYTHON_DIR}/common ${TRACY_PYTHON_DIR}/tracy
 )
 
 set(TRACY_CLIENT_PYTHON_TARGET "" CACHE STRING "Optional directory to copy python files to")

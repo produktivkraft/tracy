@@ -53,7 +53,11 @@ cmake --build capture/build
 
 ###############################################################################
 
-cmake --preset osx -DPython3_EXECUTABLE=$(which python3)
+pip install pybind11 pybind11-global
+
+# cmake --preset osx -DPython3_EXECUTABLE=$(which python3)
+cmake --preset osx_allen -DPython3_EXECUTABLE=$(which python3)
+
 cmake --build $PWD/build --target all
 cmake --build $PWD/build --target install
 
