@@ -4,7 +4,7 @@
 
 args=(
   examples/fibers.cpp
-  -o fibers
+  -o _demos/fibers
   #
   -I./public/tracy
   public/TracyClient.cpp
@@ -21,7 +21,7 @@ tracy-capture -a 127.0.0.1 -f -o _demos/trace.tracy
 
 #####
 
-./fibers
+_demos/fibers
 # test/tracy_test
 
 #####
