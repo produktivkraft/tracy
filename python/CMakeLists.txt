@@ -3,7 +3,7 @@ set(CMAKE_CXX_STANDARD 20)
 option(EXTERNAL_PYBIND11 "Whether to download pybind11" ON)
 
 if(EXTERNAL_PYBIND11)
-    find_package(Python 3.6 COMPONENTS Interpreter Development REQUIRED)
+    find_package(Python3 3.6 COMPONENTS Interpreter Development REQUIRED)
 
     include(FetchContent)
 
@@ -16,7 +16,7 @@ set(NAME_LENGTH 128 CACHE STRING "The length of a name in the buffer")
 
 pybind11_add_module(TracyClientBindings SHARED bindings/Module.cpp)
 target_link_libraries(TracyClientBindings PUBLIC TracyClient)
-target_link_libraries(TracyClientBindings PUBLIC ${Python_LIBRARIES})
+target_link_libraries(TracyClientBindings PUBLIC ${Python3_LIBRARIES})
 target_compile_definitions(TracyClientBindings PUBLIC BUFFER_SIZE=${BUFFER_SIZE})
 target_compile_definitions(TracyClientBindings PUBLIC NAME_LENGTH=${NAME_LENGTH})
 

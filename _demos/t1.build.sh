@@ -52,3 +52,9 @@ cmake "${args[@]}"
 cmake --build capture/build
 
 ###############################################################################
+
+cmake --preset osx -DPython3_EXECUTABLE=$(which python3)
+cmake --build $PWD/build --target all
+cmake --build $PWD/build --target install
+
+###############################################################################
