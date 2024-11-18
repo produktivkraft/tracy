@@ -31,6 +31,9 @@ cmake "${args[@]}"
 
 cmake --build profiler/build
 
+# only compile profiler on macos
+ln -s $PWD/profiler/build/tracy-profiler $HOME/.local/bin/
+
 ###############################################################################
 
 args=(
