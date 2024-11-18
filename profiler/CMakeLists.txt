@@ -11,16 +11,16 @@ include(${CMAKE_CURRENT_LIST_DIR}/../cmake/version.cmake)
 
 set(CMAKE_CXX_STANDARD 20)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexperimental-library")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_LIBCPP_DISABLE_AVAILABILITY")
-endif()
-
 project(
     tracy-profiler
     LANGUAGES C CXX
     VERSION ${TRACY_VERSION_STRING}
 )
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexperimental-library")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_LIBCPP_DISABLE_AVAILABILITY")
+endif()
 
 if(SELF_PROFILE)
     add_definitions(-DTRACY_ENABLE)
