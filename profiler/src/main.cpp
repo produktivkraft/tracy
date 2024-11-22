@@ -286,7 +286,7 @@ int main( int argc, char** argv )
 
     std::unique_ptr<tracy::FileRead> initFileOpen;
 #ifdef __EMSCRIPTEN__
-    initFileOpen = std::unique_ptr<tracy::FileRead>( tracy::FileRead::Open( "embed.tracy" ) );
+    // initFileOpen = std::unique_ptr<tracy::FileRead>( tracy::FileRead::Open( "embed.tracy" ) );
 #endif
     if( argc == 2 )
     {
