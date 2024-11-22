@@ -11,28 +11,9 @@
 # apple clang does not support some c++20 features
 # micromamba install clang clangxx
 
+micromamba install pkg-config
+
 mkdir -p _demos
-
-###############################################################################
-
-args=(
-  -DCPM_SOURCE_CACHE=_demos/_cpm_cache
-  -DFETCHCONTENT_BASE_DIR=_demos/_deps_profiler
-  -DCMAKE_BUILD_TYPE=Release
-  -DCMAKE_C_COMPILER=/Users/allen/micromamba/envs/pyenv/bin/clang
-  -DCMAKE_CXX_COMPILER=/Users/allen/micromamba/envs/pyenv/bin/clang++
-  -DCMAKE_LINKER_TYPE=LLD
-  -DCMAKE_OSX_DEPLOYMENT_TARGET=15.0
-  -GNinja
-  -Bprofiler/build
-  -Sprofiler
-)
-cmake "${args[@]}"
-
-cmake --build profiler/build
-
-# only compile profiler on macos
-ln -s $PWD/profiler/build/tracy-profiler $HOME/.local/bin/
 
 ###############################################################################
 
@@ -40,12 +21,11 @@ args=(
   -DCPM_SOURCE_CACHE=_demos/_cpm_cache
   -DFETCHCONTENT_BASE_DIR=_demos/_deps_capture
   -DCMAKE_BUILD_TYPE=Release
-  -DCMAKE_C_COMPILER=/Users/allen/micromamba/envs/pyenv/bin/clang
-  -DCMAKE_CXX_COMPILER=/Users/allen/micromamba/envs/pyenv/bin/clang++
-  # ld64.lld: error: undefined symbol: getopt
-  # -DCMAKE_LINKER_TYPE=LLD
+  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+  -DCMAKE_C_COMPILER=$(which gcc)
+  -DCMAKE_CXX_COMPILER=$(which g++)
   -DCMAKE_LINKER_TYPE=DEFAULT
-  -DCMAKE_OSX_DEPLOYMENT_TARGET=15.0
+  -DGTK_FILESELECTOR=false
   -GNinja
   -Bcapture/build
   -Scapture
@@ -68,8 +48,6 @@ pushd python
 pip install -e . -vvv
 popd
 
-# TODO: fix segmentation fault on macos(seems fails on conda python with pybind11)
-# `segmentation fault python`
 python -c "import tracy_client; print(tracy_client.__file__)"
 
 ###############################################################################
