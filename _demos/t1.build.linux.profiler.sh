@@ -3,6 +3,7 @@
 # just for code reading
 
 micromamba create -n tracy python=3.12
+micromamba activate tracy
 
 micromamba install fd-find ripgrep -y
 micromamba install bash-completion -y
