@@ -153,6 +153,10 @@ if(USE_WAYLAND)
         PROTOCOL ${wayland-protocols_SOURCE_DIR}/unstable/tablet/tablet-unstable-v2.xml
         BASENAME tablet
     )
+    ecm_add_wayland_client_protocol(PROFILER_FILES
+        PROTOCOL ${wayland-protocols_SOURCE_DIR}/staging/xdg-toplevel-icon/xdg-toplevel-icon-v1.xml
+        BASENAME xdg-toplevel-icon
+    )
 elseif(EMSCRIPTEN)
     set(PROFILER_FILES ${PROFILER_FILES}
         src/BackendEmscripten.cpp
@@ -190,8 +194,9 @@ if(NOT DEFINED GIT_REV)
     set(GIT_REV "HEAD")
 endif()
 
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
 add_custom_target(git-ref
-    COMMAND python3 ${CMAKE_CURRENT_LIST_DIR}/../extra/git-ref.py ${GIT_REV}
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/../extra/git-ref.py ${GIT_REV}
     BYPRODUCTS GitRef.hpp
 )
 add_dependencies(${PROJECT_NAME} git-ref)

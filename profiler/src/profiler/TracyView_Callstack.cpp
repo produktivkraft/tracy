@@ -10,14 +10,6 @@
 namespace tracy
 {
 
-static bool IsFrameExternal( const char* filename, const char* image )
-{
-    if( strncmp( filename, "/usr/", 5 ) == 0 || strncmp( filename, "/lib/", 5 ) == 0 || strcmp( filename, "[unknown]" ) == 0 || strcmp( filename, "<kernel>" ) == 0 ) return true;
-    if( strncmp( filename, "C:\\Program Files\\", 17 ) == 0 || strncmp( filename, "d:\\a01\\_work\\", 13 ) == 0 ) return true;
-    if( !image ) return false;
-    return strncmp( image, "/usr/", 5 ) == 0 || strncmp( image, "/lib/", 5 ) == 0 || strncmp( image, "/lib64/", 7 ) == 0 || strcmp( image, "<kernel>" ) == 0;
-}
-
 void View::DrawCallstackWindow()
 {
     bool show = true;
@@ -107,7 +99,11 @@ void View::DrawCallstackTable( uint32_t callstack, bool globalEntriesButton )
     ImGui::SameLine();
     ImGui::Spacing();
     ImGui::SameLine();
-    SmallCheckbox( "External frames", &m_showExternalFrames );
+    SmallCheckbox( ICON_FA_SHIELD_HALVED " External frames", &m_showExternalFrames );
+    ImGui::SameLine();
+    ImGui::Spacing();
+    ImGui::SameLine();
+    SmallCheckbox( ICON_FA_SCISSORS " Short images", &m_shortImageNames );
     ImGui::SameLine();
     ImGui::Spacing();
     ImGui::SameLine();
@@ -393,7 +389,28 @@ void View::DrawCallstackTable( uint32_t callstack, bool globalEntriesButton )
                     }
                     ImGui::PopTextWrapPos();
                     ImGui::TableNextColumn();
-                    if( image ) TextDisabledUnformatted( image );
+                    if( image )
+                    {
+                        const char* end = image + strlen( image );
+
+                        if( m_shortImageNames )
+                        {
+                            const char* ptr = end - 1;
+                            while( ptr > image && *ptr != '/' && *ptr != '\\' ) ptr--;
+                            if( *ptr == '/' || *ptr == '\\' ) ptr++;
+                            const auto cw = ImGui::GetContentRegionAvail().x;
+                            const auto tw = ImGui::CalcTextSize( image, end ).x;
+                            TextDisabledUnformatted( ptr );
+                            if( ptr != image || tw > cw ) TooltipIfHovered( image );
+                        }
+                        else
+                        {
+                            const auto cw = ImGui::GetContentRegionAvail().x;
+                            const auto tw = ImGui::CalcTextSize( image, end ).x;
+                            TextDisabledUnformatted( image );
+                            if( tw > cw ) TooltipIfHovered( image );
+                        }
+                    }
                 }
             }
         }

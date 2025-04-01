@@ -447,7 +447,14 @@ void View::DrawZoneInfoWindow()
         }
         if( m_worker.HasZoneExtra( ev ) && m_worker.GetZoneExtra( ev ).text.Active() )
         {
-            TextFocused( "User text:", m_worker.GetString( m_worker.GetZoneExtra( ev ).text ) );
+            TextDisabledUnformatted( "User text:" );
+            ImGui::SameLine();
+            if( ClipboardButton( 4 ) )
+            {
+                ImGui::SetClipboardText( m_worker.GetString( m_worker.GetZoneExtra( ev ).text ) );
+            }
+            ImGui::SameLine();
+            ImGui::TextUnformatted( m_worker.GetString( m_worker.GetZoneExtra( ev ).text ) );
         }
 
         ImGui::Separator();
@@ -457,6 +464,8 @@ void View::DrawZoneInfoWindow()
         const auto ztime = end - ev.Start();
         const auto selftime = GetZoneSelfTime( ev );
         TextFocused( "Time from start of program:", TimeToStringExact( ev.Start() ) );
+        const std::time_t ts = m_worker.GetCaptureTime() + ev.Start() / 1000000000;
+        TextFocused( "Wall clock time:", std::asctime( std::localtime( &ts) ) );
         TextFocused( "Execution time:", TimeToString( ztime ) );
 #ifndef TRACY_NO_STATISTICS
         if( m_worker.AreSourceLocationZonesReady() )

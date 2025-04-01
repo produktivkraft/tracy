@@ -3,6 +3,7 @@
 
 #include <array>
 #include <atomic>
+#include <chrono>
 #include <functional>
 #include <memory>
 #include <string>
@@ -314,6 +315,7 @@ private:
 
     void AddAnnotation( int64_t start, int64_t end );
 
+    bool IsFrameExternal( const char* filename, const char* image );
     uint32_t GetThreadColor( uint64_t thread, int depth );
     uint32_t GetSrcLocColor( const SourceLocation& srcloc, int depth );
     uint32_t GetRawSrcLocColor( const SourceLocation& srcloc, int depth );
@@ -516,9 +518,12 @@ private:
     AccumulationMode m_statAccumulationMode = AccumulationMode::SelfOnly;
     bool m_statSampleTime = true;
     int m_statMode = 0;
+    bool m_shortImageNames = false;
     int m_flameMode = 0;
     bool m_flameSort = false;
     bool m_flameRunningTime = false;
+    bool m_flameExternal = true;
+    bool m_flameExternalTail = true;
     int m_statSampleLocation = 2;
     bool m_statHideUnknown = true;
     bool m_showAllSymbols = false;
