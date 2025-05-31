@@ -3,15 +3,19 @@
 # TODO: why not works
 # micromamba install freetype glfw
 # micromamba install imgui
+# or
+# brew install glfw
 
 # TODO: why not works
 # version mismatch
 # micromamba install capstone
 
+###############################################################################
+
 # apple clang does not support some c++20 features
 # micromamba install clang clangxx
 
-micromamba install pkg-config
+# micromamba install pkg-config
 
 mkdir -p _demos
 
@@ -34,8 +38,34 @@ cmake "${args[@]}"
 
 cmake --build profiler/build
 
-# only compile profiler on macos
-ln -s $PWD/profiler/build/tracy-profiler $HOME/.local/bin/
+ln -s $PWD/profiler/build/tracy-profiler $HOME/.local/bin/tracy-profiler
+ln -s $PWD/profiler/build/tracy-profiler $HOME/.local/bin/tracy
+
+###############################################################################
+
+args=(
+  -DCPM_SOURCE_CACHE=_demos/_cpm_cache
+  -DFETCHCONTENT_BASE_DIR=_demos/_deps_profiler
+  -DCMAKE_BUILD_TYPE=Release
+  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+  -DCMAKE_C_COMPILER=/Users/allen/micromamba/envs/pyenv/bin/clang
+  -DCMAKE_CXX_COMPILER=/Users/allen/micromamba/envs/pyenv/bin/clang++
+  -DCMAKE_LINKER_TYPE=LLD
+  -DCMAKE_OSX_DEPLOYMENT_TARGET=15.0
+  -GNinja
+  -Bimport/build
+  -Simport
+)
+cmake "${args[@]}"
+
+cmake --build import/build
+
+ln -s $PWD/import/build/tracy-import-chrome $HOME/.local/bin/
+
+###############################################################################
+
+# just need `tracy-profiler` & `tracy-import-chrome`
+exit 0
 
 ###############################################################################
 
