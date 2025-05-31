@@ -18,7 +18,8 @@
             "name": "Launch",
             "type": "lldb",
             "request": "launch",
-            "program": "${command:cmake.launchTargetPath}",
+            // "program": "${command:cmake.launchTargetPath}",
+            "program": "${workspaceFolder}/profiler/build/tracy-profiler",
             "args": [],
             "cwd": "${workspaceFolder}"
         }
