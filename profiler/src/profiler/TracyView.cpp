@@ -797,10 +797,10 @@ bool View::DrawImpl()
         style.Colors[ImGuiCol_WindowBg] = ImVec4( 0.129f, 0.137f, 0.11f, 1.f );
 
         ImGui::SetNextWindowPos( viewport->Pos );
-        // ImGui::SetNextWindowSize( ImVec2( m_rootWidth, m_rootHeight ) );
+        ImGui::SetNextWindowSize( ImVec2( m_rootWidth, m_rootHeight ) );
         // NOTE: workaround for vertical scrollbar on macos
         // set a default small window szie and resize it first use
-        ImGui::SetNextWindowSize( ImVec2( 1550, 800 ), ImGuiCond_FirstUseEver );
+        // ImGui::SetNextWindowSize( ImVec2( 1550, 800 ), ImGuiCond_FirstUseEver );
         ImGui::SetNextWindowViewport( viewport->ID );
         // ImGui::Begin( "Timeline view###Profiler", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoNavFocus );
         ImGui::Begin( "Timeline view###Profiler", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoTitleBar | /*ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings |*/ ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoNavFocus );
