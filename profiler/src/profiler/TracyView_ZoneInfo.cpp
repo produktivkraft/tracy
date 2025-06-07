@@ -426,13 +426,11 @@ void View::DrawZoneInfoWindow()
             ImGui::SameLine();
             if( ClipboardButton( 1 ) ) ImGui::SetClipboardText( m_worker.GetString( srcloc.function ) );
             */
-            ImGui::PushFont( m_bigFont );
             TextDisabledUnformatted( "Function:" );
             ImGui::SameLine();
             if( ClipboardButton( 1 ) ) ImGui::SetClipboardText( m_worker.GetString( srcloc.function ) );
             ImGui::SameLine();
             ImGui::TextWrapped( m_worker.GetString( srcloc.function ) );
-            ImGui::PopFont();
         }
         SmallColorBox( GetSrcLocColor( m_worker.GetSourceLocation( ev.SrcLoc() ), 0 ) );
         ImGui::SameLine();
