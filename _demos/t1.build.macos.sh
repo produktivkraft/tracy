@@ -38,8 +38,9 @@ cmake "${args[@]}"
 
 cmake --build profiler/build
 
+rm $HOME/.local/bin/tracy-profiler
 ln -s $PWD/profiler/build/tracy-profiler $HOME/.local/bin/tracy-profiler
-ln -s $PWD/profiler/build/tracy-profiler $HOME/.local/bin/tracy
+# cp $PWD/profiler/build/tracy-profiler $HOME/.local/bin/tracy
 
 ###############################################################################
 
@@ -60,6 +61,7 @@ cmake "${args[@]}"
 
 cmake --build import/build
 
+rm $HOME/.local/bin/tracy-import-chrome
 ln -s $PWD/import/build/tracy-import-chrome $HOME/.local/bin/
 
 ###############################################################################

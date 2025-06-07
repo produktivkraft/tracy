@@ -419,11 +419,20 @@ void View::DrawZoneInfoWindow()
         }
         else
         {
+            /*
             ImGui::PushFont( m_bigFont );
             TextFocused( "Function:", m_worker.GetString( srcloc.function ) );
             ImGui::PopFont();
             ImGui::SameLine();
             if( ClipboardButton( 1 ) ) ImGui::SetClipboardText( m_worker.GetString( srcloc.function ) );
+            */
+            ImGui::PushFont( m_bigFont );
+            TextDisabledUnformatted( "Function:" );
+            ImGui::SameLine();
+            if( ClipboardButton( 1 ) ) ImGui::SetClipboardText( m_worker.GetString( srcloc.function ) );
+            ImGui::SameLine();
+            ImGui::TextWrapped( m_worker.GetString( srcloc.function ) );
+            ImGui::PopFont();
         }
         SmallColorBox( GetSrcLocColor( m_worker.GetSourceLocation( ev.SrcLoc() ), 0 ) );
         ImGui::SameLine();
@@ -454,7 +463,7 @@ void View::DrawZoneInfoWindow()
                 ImGui::SetClipboardText( m_worker.GetString( m_worker.GetZoneExtra( ev ).text ) );
             }
             ImGui::SameLine();
-            ImGui::TextUnformatted( m_worker.GetString( m_worker.GetZoneExtra( ev ).text ) );
+            ImGui::TextWrapped( m_worker.GetString( m_worker.GetZoneExtra( ev ).text ) );
         }
 
         ImGui::Separator();
