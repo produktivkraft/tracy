@@ -432,7 +432,7 @@ void View::DrawFindZone()
         auto& zoneData = m_worker.GetZonesForSourceLocation( m_findZone.match[m_findZone.selMatch] );
         auto& zones = zoneData.zones;
         zones.ensure_sorted();
-        if( ImGui::TreeNodeEx( "Histogram", ImGuiTreeNodeFlags_DefaultOpen ) )
+        if( ImGui::TreeNodeEx( "Histogram", ImGuiTreeNodeFlags_None ) )
         {
             const auto ty = ImGui::GetTextLineHeight();
 
